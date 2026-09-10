@@ -110,6 +110,12 @@ static void HBTDumpCandidateClasses(void) {
 }
 
 // ---- Known hook target (may not exist on all iOS versions - safe no-op if absent) ----
+@interface SBHomeGrabberView : UIView
+@end
+
+@interface MTLumaDodgePillView : UIView
+@end
+
 %hook SBHomeGrabberView
 
 - (void)layoutSubviews {

@@ -4,9 +4,9 @@ INSTALL_TARGET_PROCESSES = SpringBoard
 
 include $(THEOS)/makefiles/common.mk
 
-TWEAK_NAME = HomeBarTint
-HomeBarTint_FILES = Tweak.xm
-HomeBarTint_CFLAGS = -fobjc-arc -Wno-deprecated-declarations
+TWEAK_NAME = SlipperyBar
+SlipperyBar_FILES = Tweak.xm
+SlipperyBar_CFLAGS = -fobjc-arc -Wno-deprecated-declarations
 
 BUNDLE_NAME = HomeBarTintPrefs
 HomeBarTintPrefs_FILES = HBTPrefsListController.m HBTColorPickerController.m

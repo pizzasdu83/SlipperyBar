@@ -1,5 +1,5 @@
 Package: com.pizzasdu83.homebartint
-Name: HomeBarTint
+Name: Slippery Bar
 Version: 0.1.0
 Architecture: iphoneos-arm64
 Description: Recolor the home indicator with a solid color or gradient, configurable in Settings.
