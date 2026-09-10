@@ -1,0 +1,9 @@
+Package: com.pizzasdu83.homebartint
+Name: HomeBarTint
+Version: 0.1.0
+Architecture: iphoneos-arm64
+Description: Recolor the home indicator with a solid color or gradient, configurable in Settings.
+Maintainer: pizzasdu83
+Author: pizzasdu83
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000), firmware (>= 15.0), preferenceloader
