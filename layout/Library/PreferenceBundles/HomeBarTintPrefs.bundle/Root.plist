@@ -4,8 +4,9 @@
 <dict>
 	<key>title</key>
 	<string>Slippery Bar</string>
-	<key>specifiers</key>
-	<array>
+	<key>items</key>
+    <array>
+
 
 		<dict>
 			<key>type</key>
