@@ -73,8 +73,24 @@ static void HBTApplyOverlay(UIView *pillView) {
         objc_setAssociatedObject(pillView, HBTOverlayKey, overlay, OBJC_ASSOCIATION_RETAIN);
     }
     overlay.hidden = NO;
-    overlay.frame = pillView.bounds;
-    overlay.cornerRadius = pillView.layer.cornerRadius;
+
+    // SAFETY: never trust pillView.bounds directly. On-device, the hooked view
+    // can temporarily grow far beyond the visible pill (e.g. to host a larger
+    // touch-catching area for system gestures). If we ever painted that full
+    // area, it would blank out whatever is behind it - including foreground
+    // app content. So we always compute a small pill-shaped rect ourselves,
+    // anchored at the bottom-center of whatever bounds we're given, capped at
+    // a sane maximum size, and never larger than the view actually is.
+    CGFloat maxPillWidth = 140.0f;
+    CGFloat pillHeight = 5.0f;
+    CGFloat viewW = pillView.bounds.size.width;
+    CGFloat viewH = pillView.bounds.size.height;
+    CGFloat w = MIN(maxPillWidth, viewW);
+    CGFloat h = MIN(pillHeight, viewH);
+    CGRect safeRect = CGRectMake((viewW - w) * 0.5f, MAX(0, viewH - h - 8.0f), w, h);
+
+    overlay.frame = safeRect;
+    overlay.cornerRadius = h * 0.5f;
 
     if (hbtIsGradient) {
         overlay.colors = @[(id)hbtColor1.CGColor, (id)hbtColor2.CGColor];
@@ -109,11 +125,8 @@ static void HBTDumpCandidateClasses(void) {
     [log writeToFile:HBT_LOGPATH atomically:YES encoding:NSUTF8StringEncoding error:nil];
 }
 
-// ---- Known hook target (may not exist on all iOS versions - safe no-op if absent) ----
+// ---- Known hook target, confirmed present via on-device classdump ----
 @interface SBHomeGrabberView : UIView
-@end
-
-@interface MTLumaDodgePillView : UIView
 @end
 
 %hook SBHomeGrabberView
@@ -130,22 +143,10 @@ static void HBTDumpCandidateClasses(void) {
 
 %end
 
-// Historically the actual pill drawing lives one level down; hook it too so the
-// overlay sits above the luma-dodge blend view and fully replaces its color.
-%hook MTLumaDodgePillView
-
-- (void)layoutSubviews {
-    %orig;
-    HBTApplyOverlay(self.superview ?: self);
-}
-
-%end
-
 static void HBTReloadCallback(CFNotificationCenterRef center, void *observer,
                                CFStringRef name, const void *object,
                                CFDictionaryRef userInfo) {
     HBTLoadPrefs();
-    // Force a re-layout pass on any live pill views next runloop turn.
 }
 
 %ctor {
