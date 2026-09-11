@@ -13,6 +13,7 @@ HomeBarTintPrefs_FILES = HBTPrefsListController.m HBTColorPickerController.m
 HomeBarTintPrefs_INSTALL_PATH = /Library/PreferenceBundles
 HomeBarTintPrefs_FRAMEWORKS = UIKit
 HomeBarTintPrefs_PRIVATE_FRAMEWORKS = Preferences
+HomeBarTintPrefs_LDFLAGS = -ObjC
 HomeBarTintPrefs_CFLAGS = -fobjc-arc -Wno-deprecated-declarations
 
 include $(THEOS_MAKE_PATH)/tweak.mk
