@@ -147,6 +147,7 @@ static void HBTReloadCallback(CFNotificationCenterRef center, void *observer,
                                CFStringRef name, const void *object,
                                CFDictionaryRef userInfo) {
     HBTLoadPrefs();
+    // Force a re-layout pass on any live pill views next runloop turn.
 }
 
 %ctor {
