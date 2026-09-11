@@ -6,6 +6,8 @@
 	<dict>
 		<key>bundle</key>
 		<string>HomeBarTintPrefs</string>
+		<key>icon</key>
+		<string>SlipperyBarIcon.png</string>
 		<key>cell</key>
 		<string>PSLinkCell</string>
 		<key>icon</key>
