@@ -5,13 +5,12 @@
 	<key>title</key>
 	<string>Slippery Bar</string>
 	<key>items</key>
-    <array>
-
+	<array>
 
 		<dict>
 			<key>type</key>
 			<string>PSGroupSpecifier</string>
-			<key>title</key>
+			<key>label</key>
 			<string>Slippery Bar</string>
 			<key>footerText</key>
 			<string>Recolor the home indicator. Solid uses Color 1 only; Gradient blends Color 1 to Color 2 along Angle.</string>
@@ -20,7 +19,7 @@
 		<dict>
 			<key>type</key>
 			<string>PSSwitchSpecifier</string>
-			<key>title</key>
+			<key>label</key>
 			<string>Enabled</string>
 			<key>key</key>
 			<string>Enabled</string>
@@ -35,7 +34,7 @@
 		<dict>
 			<key>type</key>
 			<string>PSSegmentSpecifier</string>
-			<key>title</key>
+			<key>label</key>
 			<string>Mode</string>
 			<key>key</key>
 			<string>Mode</string>
@@ -60,7 +59,7 @@
 		<dict>
 			<key>type</key>
 			<string>PSButtonSpecifier</string>
-			<key>title</key>
+			<key>label</key>
 			<string>Color 1</string>
 			<key>action</key>
 			<string>hbtPickColor1</string>
@@ -69,7 +68,7 @@
 		<dict>
 			<key>type</key>
 			<string>PSButtonSpecifier</string>
-			<key>title</key>
+			<key>label</key>
 			<string>Color 2 (gradient only)</string>
 			<key>action</key>
 			<string>hbtPickColor2</string>
@@ -78,7 +77,7 @@
 		<dict>
 			<key>type</key>
 			<string>PSSliderSpecifier</string>
-			<key>title</key>
+			<key>label</key>
 			<string>Gradient Angle</string>
 			<key>key</key>
 			<string>Angle</string>
