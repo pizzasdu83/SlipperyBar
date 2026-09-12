@@ -55,19 +55,13 @@
 
 		<dict>
 			<key>cell</key>
-			<string>PSEditableTextCell</string>
+			<string>PSEditTextCell</string>
 			<key>label</key>
 			<string>Hex (overrides sliders)</string>
 			<key>key</key>
 			<string>Color1Hex</string>
 			<key>default</key>
 			<string></string>
-			<key>PlaceholderText</key>
-			<string>e.g. FF00AA</string>
-			<key>AutocapitalizationType</key>
-			<string>allCharacters</string>
-			<key>AutocorrectionType</key>
-			<string>no</string>
 			<key>defaults</key>
 			<string>com.pizzasdu83.homebartint</string>
 			<key>PostNotification</key>
@@ -140,19 +134,13 @@
 
 		<dict>
 			<key>cell</key>
-			<string>PSEditableTextCell</string>
+			<string>PSEditTextCell</string>
 			<key>label</key>
 			<string>Hex (overrides sliders)</string>
 			<key>key</key>
 			<string>Color2Hex</string>
 			<key>default</key>
 			<string></string>
-			<key>PlaceholderText</key>
-			<string>e.g. 007AFF</string>
-			<key>AutocapitalizationType</key>
-			<string>allCharacters</string>
-			<key>AutocorrectionType</key>
-			<string>no</string>
 			<key>defaults</key>
 			<string>com.pizzasdu83.homebartint</string>
 			<key>PostNotification</key>
@@ -218,17 +206,15 @@
 
 		<dict>
 			<key>cell</key>
-			<string>PSSliderCell</string>
+			<string>PSEditTextCell</string>
 			<key>label</key>
-			<string>Gradient Angle</string>
+			<string>Gradient Angle (degrees)</string>
 			<key>key</key>
 			<string>Angle</string>
 			<key>default</key>
-			<real>0</real>
-			<key>min</key>
-			<real>0</real>
-			<key>max</key>
-			<real>360</real>
+			<string>0</string>
+			<key>keyboard</key>
+			<string>NumberPad</string>
 			<key>defaults</key>
 			<string>com.pizzasdu83.homebartint</string>
 			<key>PostNotification</key>
