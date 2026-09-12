@@ -9,7 +9,7 @@ SlipperyBar_FILES = Tweak.xm
 SlipperyBar_CFLAGS = -fobjc-arc -Wno-deprecated-declarations
 
 BUNDLE_NAME = HomeBarTintPrefs
-HomeBarTintPrefs_FILES = HBTPrefsListController.m HBTColorPickerController.m
+HomeBarTintPrefs_FILES = HBTPrefsListController.m
 HomeBarTintPrefs_INSTALL_PATH = /Library/PreferenceBundles
 HomeBarTintPrefs_FRAMEWORKS = UIKit
 HomeBarTintPrefs_PRIVATE_FRAMEWORKS = Preferences

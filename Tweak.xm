@@ -13,13 +13,41 @@ static UIColor *hbtColor1;
 static UIColor *hbtColor2;
 static CGFloat hbtAngleDegrees = 0.0f;
 
-static UIColor *HBTColorFromString(NSString *s, UIColor *fallback) {
-    if (!s) return fallback;
-    NSArray<NSString *> *parts = [s componentsSeparatedByString:@","];
-    if (parts.count != 4) return fallback;
-    CGFloat r = parts[0].floatValue, g = parts[1].floatValue,
-            b = parts[2].floatValue, a = parts[3].floatValue;
-    return [UIColor colorWithRed:r green:g blue:b alpha:a];
+static CGFloat HBTReadChannel(CFStringRef key, CGFloat fallback) {
+    CFPropertyListRef ref = CFPreferencesCopyAppValue(key, HBT_DOMAIN);
+    if (!ref) return fallback;
+    CGFloat value = [(__bridge id)ref floatValue];
+    CFRelease(ref);
+    return value;
+}
+
+// Returns nil if the string isn't a valid 6-digit hex color, so callers can
+// fall back to the RGB sliders instead.
+static UIColor *HBTColorFromHex(NSString *hex) {
+    if (!hex) return nil;
+    NSString *s = [hex stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if ([s hasPrefix:@"#"]) s = [s substringFromIndex:1];
+    if (s.length != 6) return nil;
+    unsigned int rgbValue = 0;
+    NSScanner *scanner = [NSScanner scannerWithString:s];
+    if (![scanner scanHexInt:&rgbValue] || !scanner.isAtEnd) return nil;
+    CGFloat r = ((rgbValue & 0xFF0000) >> 16) / 255.0f;
+    CGFloat g = ((rgbValue & 0x00FF00) >> 8) / 255.0f;
+    CGFloat b = (rgbValue & 0x0000FF) / 255.0f;
+    return [UIColor colorWithRed:r green:g blue:b alpha:1.0f];
+}
+
+static UIColor *HBTReadColor(CFStringRef hexKey, CFStringRef rKey, CFStringRef gKey,
+                              CFStringRef bKey, CGFloat rDefault, CGFloat gDefault, CGFloat bDefault) {
+    CFPropertyListRef hexRef = CFPreferencesCopyAppValue(hexKey, HBT_DOMAIN);
+    UIColor *fromHex = hexRef ? HBTColorFromHex((__bridge NSString *)hexRef) : nil;
+    if (hexRef) CFRelease(hexRef);
+    if (fromHex) return fromHex;
+
+    return [UIColor colorWithRed:HBTReadChannel(rKey, rDefault) / 255.0f
+                            green:HBTReadChannel(gKey, gDefault) / 255.0f
+                             blue:HBTReadChannel(bKey, bDefault) / 255.0f
+                            alpha:1.0f];
 }
 
 static void HBTLoadPrefs(void) {
@@ -29,18 +57,12 @@ static void HBTLoadPrefs(void) {
     hbtEnabled = enabledRef ? [(__bridge id)enabledRef boolValue] : YES;
     if (enabledRef) CFRelease(enabledRef);
 
-    CFPropertyListRef modeRef = CFPreferencesCopyAppValue(CFSTR("Mode"), HBT_DOMAIN);
-    NSString *mode = modeRef ? (__bridge NSString *)modeRef : @"solid";
-    hbtIsGradient = [mode isEqualToString:@"gradient"];
-    if (modeRef) CFRelease(modeRef);
+    CFPropertyListRef gradRef = CFPreferencesCopyAppValue(CFSTR("GradientEnabled"), HBT_DOMAIN);
+    hbtIsGradient = gradRef ? [(__bridge id)gradRef boolValue] : NO;
+    if (gradRef) CFRelease(gradRef);
 
-    CFPropertyListRef c1Ref = CFPreferencesCopyAppValue(CFSTR("Color1"), HBT_DOMAIN);
-    hbtColor1 = HBTColorFromString(c1Ref ? (__bridge NSString *)c1Ref : nil, [UIColor whiteColor]);
-    if (c1Ref) CFRelease(c1Ref);
-
-    CFPropertyListRef c2Ref = CFPreferencesCopyAppValue(CFSTR("Color2"), HBT_DOMAIN);
-    hbtColor2 = HBTColorFromString(c2Ref ? (__bridge NSString *)c2Ref : nil, [UIColor systemBlueColor]);
-    if (c2Ref) CFRelease(c2Ref);
+    hbtColor1 = HBTReadColor(CFSTR("Color1Hex"), CFSTR("Color1R"), CFSTR("Color1G"), CFSTR("Color1B"), 255, 255, 255);
+    hbtColor2 = HBTReadColor(CFSTR("Color2Hex"), CFSTR("Color2R"), CFSTR("Color2G"), CFSTR("Color2B"), 0, 122, 255);
 
     CFPropertyListRef angleRef = CFPreferencesCopyAppValue(CFSTR("Angle"), HBT_DOMAIN);
     hbtAngleDegrees = angleRef ? [(__bridge id)angleRef floatValue] : 0.0f;

@@ -13,7 +13,7 @@
 			<key>label</key>
 			<string>Slippery Bar</string>
 			<key>footerText</key>
-			<string>Recolor the home indicator. Solid uses Color 1 only; Gradient blends Color 1 to Color 2 along Angle.</string>
+			<string>Recolor the home indicator. When Gradient is off, Color 1 is used alone.</string>
 		</dict>
 
 		<dict>
@@ -33,45 +33,187 @@
 
 		<dict>
 			<key>cell</key>
-			<string>PSMultiValueCell</string>
+			<string>PSSwitchCell</string>
 			<key>label</key>
-			<string>Mode</string>
+			<string>Gradient</string>
 			<key>key</key>
-			<string>Mode</string>
+			<string>GradientEnabled</string>
 			<key>default</key>
-			<string>solid</string>
+			<false/>
 			<key>defaults</key>
 			<string>com.pizzasdu83.homebartint</string>
 			<key>PostNotification</key>
 			<string>com.pizzasdu83.homebartint/reload</string>
-			<key>values</key>
-			<array>
-				<string>solid</string>
-				<string>gradient</string>
-			</array>
-			<key>titles</key>
-			<array>
-				<string>Solid</string>
-				<string>Gradient</string>
-			</array>
 		</dict>
 
 		<dict>
 			<key>cell</key>
-			<string>PSLinkCell</string>
+			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>Color 1</string>
-			<key>action</key>
-			<string>hbtPickColor1</string>
 		</dict>
 
 		<dict>
 			<key>cell</key>
-			<string>PSLinkCell</string>
+			<string>PSEditableTextCell</string>
+			<key>label</key>
+			<string>Hex (overrides sliders)</string>
+			<key>key</key>
+			<string>Color1Hex</string>
+			<key>default</key>
+			<string></string>
+			<key>PlaceholderText</key>
+			<string>e.g. FF00AA</string>
+			<key>AutocapitalizationType</key>
+			<string>allCharacters</string>
+			<key>AutocorrectionType</key>
+			<string>no</string>
+			<key>defaults</key>
+			<string>com.pizzasdu83.homebartint</string>
+			<key>PostNotification</key>
+			<string>com.pizzasdu83.homebartint/reload</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSSliderCell</string>
+			<key>label</key>
+			<string>Red</string>
+			<key>key</key>
+			<string>Color1R</string>
+			<key>default</key>
+			<real>255</real>
+			<key>min</key>
+			<real>0</real>
+			<key>max</key>
+			<real>255</real>
+			<key>defaults</key>
+			<string>com.pizzasdu83.homebartint</string>
+			<key>PostNotification</key>
+			<string>com.pizzasdu83.homebartint/reload</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSSliderCell</string>
+			<key>label</key>
+			<string>Green</string>
+			<key>key</key>
+			<string>Color1G</string>
+			<key>default</key>
+			<real>255</real>
+			<key>min</key>
+			<real>0</real>
+			<key>max</key>
+			<real>255</real>
+			<key>defaults</key>
+			<string>com.pizzasdu83.homebartint</string>
+			<key>PostNotification</key>
+			<string>com.pizzasdu83.homebartint/reload</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSSliderCell</string>
+			<key>label</key>
+			<string>Blue</string>
+			<key>key</key>
+			<string>Color1B</string>
+			<key>default</key>
+			<real>255</real>
+			<key>min</key>
+			<real>0</real>
+			<key>max</key>
+			<real>255</real>
+			<key>defaults</key>
+			<string>com.pizzasdu83.homebartint</string>
+			<key>PostNotification</key>
+			<string>com.pizzasdu83.homebartint/reload</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>Color 2 (gradient only)</string>
-			<key>action</key>
-			<string>hbtPickColor2</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSEditableTextCell</string>
+			<key>label</key>
+			<string>Hex (overrides sliders)</string>
+			<key>key</key>
+			<string>Color2Hex</string>
+			<key>default</key>
+			<string></string>
+			<key>PlaceholderText</key>
+			<string>e.g. 007AFF</string>
+			<key>AutocapitalizationType</key>
+			<string>allCharacters</string>
+			<key>AutocorrectionType</key>
+			<string>no</string>
+			<key>defaults</key>
+			<string>com.pizzasdu83.homebartint</string>
+			<key>PostNotification</key>
+			<string>com.pizzasdu83.homebartint/reload</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSSliderCell</string>
+			<key>label</key>
+			<string>Red</string>
+			<key>key</key>
+			<string>Color2R</string>
+			<key>default</key>
+			<real>0</real>
+			<key>min</key>
+			<real>0</real>
+			<key>max</key>
+			<real>255</real>
+			<key>defaults</key>
+			<string>com.pizzasdu83.homebartint</string>
+			<key>PostNotification</key>
+			<string>com.pizzasdu83.homebartint/reload</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSSliderCell</string>
+			<key>label</key>
+			<string>Green</string>
+			<key>key</key>
+			<string>Color2G</string>
+			<key>default</key>
+			<real>122</real>
+			<key>min</key>
+			<real>0</real>
+			<key>max</key>
+			<real>255</real>
+			<key>defaults</key>
+			<string>com.pizzasdu83.homebartint</string>
+			<key>PostNotification</key>
+			<string>com.pizzasdu83.homebartint/reload</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSSliderCell</string>
+			<key>label</key>
+			<string>Blue</string>
+			<key>key</key>
+			<string>Color2B</string>
+			<key>default</key>
+			<real>255</real>
+			<key>min</key>
+			<real>0</real>
+			<key>max</key>
+			<real>255</real>
+			<key>defaults</key>
+			<string>com.pizzasdu83.homebartint</string>
+			<key>PostNotification</key>
+			<string>com.pizzasdu83.homebartint/reload</string>
 		</dict>
 
 		<dict>
