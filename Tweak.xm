@@ -86,6 +86,8 @@ static void HBTApplyOverlay(UIView *pillView) {
     CAGradientLayer *overlay = objc_getAssociatedObject(pillView, HBTOverlayKey);
     if (!hbtEnabled) {
         overlay.hidden = YES;
+        // Restore whatever native rendering subviews draw the stock pill.
+        for (UIView *sub in pillView.subviews) sub.hidden = NO;
         return;
     }
     if (!overlay) {
@@ -95,6 +97,16 @@ static void HBTApplyOverlay(UIView *pillView) {
         objc_setAssociatedObject(pillView, HBTOverlayKey, overlay, OBJC_ASSOCIATION_RETAIN);
     }
     overlay.hidden = NO;
+    // Force front-most regardless of when/how native content gets (re)added to
+    // this layer on subsequent layout passes.
+    overlay.zPosition = 1000;
+
+    // Hide the native pill's own rendering subviews (whatever their class),
+    // rather than only painting over them - otherwise the stock white/adaptive
+    // pill stays visible underneath until its own fade-out finishes. These are
+    // purely cosmetic child views; SBHomeGrabberView itself (not these
+    // children) is what handles the system gesture, so hiding them is safe.
+    for (UIView *sub in pillView.subviews) sub.hidden = YES;
 
     // SAFETY: never trust pillView.bounds directly. On-device, the hooked view
     // can temporarily grow far beyond the visible pill (e.g. to host a larger
