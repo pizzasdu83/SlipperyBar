@@ -10,8 +10,6 @@
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
-			<key>label</key>
-			<string>Slippery Bar</string>
 			<key>footerText</key>
 			<string>Recolor the home indicator. When Gradient is off, Color 1 is used alone.</string>
 		</dict>
@@ -206,9 +204,18 @@
 
 		<dict>
 			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Gradient Direction</string>
+			<key>footerText</key>
+			<string>The angle, in degrees, the gradient runs along (0 = left to right).</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
 			<string>PSEditTextCell</string>
 			<key>label</key>
-			<string>Gradient Angle (degrees)</string>
+			<string>Angle</string>
 			<key>key</key>
 			<string>Angle</string>
 			<key>default</key>
@@ -219,6 +226,22 @@
 			<string>com.pizzasdu83.homebartint</string>
 			<key>PostNotification</key>
 			<string>com.pizzasdu83.homebartint/reload</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSLinkCell</string>
+			<key>label</key>
+			<string>Source Code</string>
+			<key>icon</key>
+			<string>github.png</string>
+			<key>action</key>
+			<string>openSourceRepository</string>
 		</dict>
 
 	</array>
