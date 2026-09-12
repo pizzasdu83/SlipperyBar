@@ -33,7 +33,7 @@
 
 		<dict>
 			<key>cell</key>
-			<string>PSSegmentCell</string>
+			<string>PSMultiValueCell</string>
 			<key>label</key>
 			<string>Mode</string>
 			<key>key</key>

@@ -125,6 +125,20 @@ static void HBTDumpCandidateClasses(void) {
     [log writeToFile:HBT_LOGPATH atomically:YES encoding:NSUTF8StringEncoding error:nil];
 }
 
+// ---- Track every live pill view so a polling fallback can re-apply colors
+// even if the darwin notification never reaches SpringBoard (this device's
+// SpringBoard log shows libSandy sandbox-extension issues, so cross-process
+// notifications from a sandboxed Settings/TweakSettings process are not
+// guaranteed to arrive). Weak references so we never keep a dead view alive.
+static NSHashTable<UIView *> *hbtTrackedViews;
+
+static void HBTTrackView(UIView *pillView) {
+    if (!hbtTrackedViews) {
+        hbtTrackedViews = [NSHashTable weakObjectsHashTable];
+    }
+    [hbtTrackedViews addObject:pillView];
+}
+
 // ---- Known hook target, confirmed present via on-device classdump ----
 @interface SBHomeGrabberView : UIView
 @end
@@ -133,12 +147,16 @@ static void HBTDumpCandidateClasses(void) {
 
 - (void)layoutSubviews {
     %orig;
+    HBTTrackView(self);
     HBTApplyOverlay(self);
 }
 
 - (void)didMoveToWindow {
     %orig;
-    if (self.window) HBTApplyOverlay(self);
+    if (self.window) {
+        HBTTrackView(self);
+        HBTApplyOverlay(self);
+    }
 }
 
 %end
@@ -150,6 +168,13 @@ static void HBTReloadCallback(CFNotificationCenterRef center, void *observer,
     // Force a re-layout pass on any live pill views next runloop turn.
 }
 
+static void HBTPollTick(CFRunLoopTimerRef timer, void *info) {
+    HBTLoadPrefs();
+    for (UIView *v in hbtTrackedViews) {
+        HBTApplyOverlay(v);
+    }
+}
+
 %ctor {
     HBTLoadPrefs();
     HBTDumpCandidateClasses();
@@ -157,4 +182,12 @@ static void HBTReloadCallback(CFNotificationCenterRef center, void *observer,
         CFNotificationCenterGetDarwinNotifyCenter(),
         NULL, HBTReloadCallback, CFSTR(HBT_NOTIFY), NULL,
         CFNotificationSuspensionBehaviorDeliverImmediately);
+
+    // Fallback path: re-check preferences once a second regardless of whether
+    // the darwin notification made it across. Cheap (a couple of CFPreferences
+    // reads) and immune to sandbox/IPC issues that can drop the notification.
+    CFRunLoopTimerRef pollTimer = CFRunLoopTimerCreate(
+        kCFAllocatorDefault, CFAbsoluteTimeGetCurrent(), 1.0, 0, 0,
+        HBTPollTick, NULL);
+    CFRunLoopAddTimer(CFRunLoopGetMain(), pollTimer, kCFRunLoopCommonModes);
 }
