@@ -38,5 +38,5 @@ jobs:
       - name: Upload package
         uses: actions/upload-artifact@v7
         with:
-          name: "Package built by ${{ matrix.os }}"
+          name: "Home made bar"
           path: ${{ github.workspace }}/packages/*.deb
