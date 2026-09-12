@@ -1,9 +1,6 @@
 name: Homebrewing-the-tweak
 
 on:
-  push:
-    branches:
-      - '*'
   workflow_dispatch:
 
   
