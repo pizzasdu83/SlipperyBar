@@ -1,4 +1,5 @@
 #import <UIKit/UIKit.h>
+#import <QuartzCore/QuartzCore.h>
 #import <CoreFoundation/CoreFoundation.h>
 #import <objc/runtime.h>
 
@@ -93,9 +94,19 @@ static void HBTApplyOverlay(UIView *pillView) {
     if (!overlay) {
         overlay = [CAGradientLayer layer];
         overlay.cornerRadius = pillView.layer.cornerRadius;
+        overlay.opacity = 0.0f;
         [pillView.layer addSublayer:overlay];
         objc_setAssociatedObject(pillView, HBTOverlayKey, overlay, OBJC_ASSOCIATION_RETAIN);
+        // Fade in rather than cutting straight to full color, closer to how
+        // the system's own home indicator eases into view.
+        CABasicAnimation *fadeIn = [CABasicAnimation animationWithKeyPath:@"opacity"];
+        fadeIn.fromValue = @0.0;
+        fadeIn.toValue = @1.0;
+        fadeIn.duration = 0.25;
+        fadeIn.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+        [overlay addAnimation:fadeIn forKey:@"hbtFadeIn"];
     }
+    overlay.opacity = 1.0f;
     overlay.hidden = NO;
     // Force front-most regardless of when/how native content gets (re)added to
     // this layer on subsequent layout passes.
@@ -195,6 +206,27 @@ static void HBTTrackView(UIView *pillView) {
 
 %end
 
+// ---- Mirror the native view's own opacity onto our overlay every frame, so
+// fades (inactivity dimming, hiding during video/Face ID, etc.) carry over.
+// We only copy opacity - shape/position is still handled by HBTApplyOverlay.
+@interface HBTDisplayLinkTarget : NSObject
+@end
+
+@implementation HBTDisplayLinkTarget
+
+- (void)hbtTick:(CADisplayLink *)link {
+    for (UIView *v in hbtTrackedViews) {
+        CAGradientLayer *overlay = objc_getAssociatedObject(v, HBTOverlayKey);
+        if (!overlay || overlay.hidden) continue;
+        CALayer *presentation = v.layer.presentationLayer;
+        overlay.opacity = presentation ? presentation.opacity : v.layer.opacity;
+    }
+}
+
+@end
+
+static HBTDisplayLinkTarget *hbtDisplayLinkTarget;
+
 static void HBTReloadCallback(CFNotificationCenterRef center, void *observer,
                                CFStringRef name, const void *object,
                                CFDictionaryRef userInfo) {
@@ -224,4 +256,10 @@ static void HBTPollTick(CFRunLoopTimerRef timer, void *info) {
         kCFAllocatorDefault, CFAbsoluteTimeGetCurrent(), 1.0, 0, 0,
         HBTPollTick, NULL);
     CFRunLoopAddTimer(CFRunLoopGetMain(), pollTimer, kCFRunLoopCommonModes);
+
+    // Per-frame opacity mirror (see HBTDisplayLinkTarget above).
+    hbtDisplayLinkTarget = [HBTDisplayLinkTarget new];
+    CADisplayLink *link = [CADisplayLink displayLinkWithTarget:hbtDisplayLinkTarget
+                                                       selector:@selector(hbtTick:)];
+    [link addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
 }
