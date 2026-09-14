@@ -232,6 +232,60 @@ static void HBTDumpCandidateClasses(void) {
     [log writeToFile:HBT_LOGPATH atomically:YES encoding:NSUTF8StringEncoding error:nil];
 }
 
+// ---- Diagnostic: dump the real view/layer structure around the pill once,
+// so we can see actual classes/filters/colors instead of guessing further.
+#define HBT_VIEWDUMP_PATH @"/var/mobile/Documents/HomeBarTint-viewdump.txt"
+static BOOL hbtDidDumpViewHierarchy = NO;
+
+static NSString *HBTDescribeFilters(CALayer *layer) {
+    NSMutableString *s = [NSMutableString string];
+    if (layer.compositingFilter) [s appendFormat:@"compositingFilter=%@ ", layer.compositingFilter];
+    if (layer.filters.count) [s appendFormat:@"filters=%@ ", layer.filters];
+    if (layer.mask) [s appendFormat:@"hasMask=YES "];
+    return s;
+}
+
+static void HBTDumpViewRecursive(UIView *view, NSMutableString *out, NSInteger depth) {
+    if (!view || depth > 6) return;
+    NSString *indent = [@"" stringByPaddingToLength:(NSUInteger)depth * 2 withString:@" " startingAtIndex:0];
+    [out appendFormat:@"%@%@ frame=%@ alpha=%.2f hidden=%d bg=%@ layer.opacity=%.2f layer.bg=%@ %@sublayers=%lu\n",
+        indent, NSStringFromClass([view class]), NSStringFromCGRect(view.frame), view.alpha, view.hidden,
+        view.backgroundColor, view.layer.opacity, view.layer.backgroundColor,
+        HBTDescribeFilters(view.layer), (unsigned long)view.layer.sublayers.count];
+    for (CALayer *sub in view.layer.sublayers ?: @[]) {
+        BOOL isBackingLayerOfSubview = NO;
+        for (UIView *v in view.subviews) if (v.layer == sub) { isBackingLayerOfSubview = YES; break; }
+        if (!isBackingLayerOfSubview) {
+            [out appendFormat:@"%@  [layer] %@ opacity=%.2f %@\n",
+                indent, [sub class], sub.opacity, HBTDescribeFilters(sub)];
+        }
+    }
+    for (UIView *sub in view.subviews) {
+        HBTDumpViewRecursive(sub, out, depth + 1);
+    }
+}
+
+static void HBTDumpViewHierarchyOnce(UIView *pillView) {
+    if (hbtDidDumpViewHierarchy) return;
+    hbtDidDumpViewHierarchy = YES;
+
+    NSMutableString *out = [NSMutableString string];
+    [out appendString:@"=== Ancestors (outward) ===\n"];
+    UIView *ancestor = pillView.superview;
+    NSInteger up = 0;
+    while (ancestor && up < 3) {
+        [out appendFormat:@"^%ld %@ frame=%@ layer.opacity=%.2f %@\n",
+            (long)up, NSStringFromClass([ancestor class]), NSStringFromCGRect(ancestor.frame),
+            ancestor.layer.opacity, HBTDescribeFilters(ancestor.layer)];
+        ancestor = ancestor.superview;
+        up++;
+    }
+    [out appendString:@"\n=== Pill view + descendants ===\n"];
+    HBTDumpViewRecursive(pillView, out, 0);
+
+    [out writeToFile:HBT_VIEWDUMP_PATH atomically:YES encoding:NSUTF8StringEncoding error:nil];
+}
+
 // ---- Track every live pill view so a polling fallback can re-apply colors
 // even if the darwin notification never reaches SpringBoard (this device's
 // SpringBoard log shows libSandy sandbox-extension issues, so cross-process
@@ -255,6 +309,7 @@ static void HBTTrackView(UIView *pillView) {
 - (void)layoutSubviews {
     %orig;
     HBTTrackView(self);
+    HBTDumpViewHierarchyOnce(self);
     HBTApplyOverlay(self);
 }
 
