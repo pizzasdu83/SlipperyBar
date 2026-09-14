@@ -80,6 +80,11 @@ static void HBTGradientPointsForAngle(CGFloat degrees, CGPoint *start, CGPoint *
 
 // ---- Overlay that paints the pill shape ----
 static const void *HBTOverlayKey = &HBTOverlayKey;
+static const void *HBTDimmedKey = &HBTDimmedKey;
+
+static CFAbsoluteTime hbtLastTouchTime = 0;
+static const CFTimeInterval kHBTIdleDimDelay = 3.0;
+static const CGFloat kHBTDimmedOpacity = 0.35f;
 
 static void HBTApplyOverlay(UIView *pillView) {
     if (!pillView) return;
@@ -182,6 +187,44 @@ static void HBTApplyOverlay(UIView *pillView) {
     }
 }
 
+// ---- Touch feedback: slight scale-up while pressed, back to normal on release.
+static void HBTHandleTouchDown(UIView *pillView) {
+    CAGradientLayer *overlay = objc_getAssociatedObject(pillView, HBTOverlayKey);
+    if (!overlay || overlay.hidden) return;
+    objc_setAssociatedObject(pillView, HBTDimmedKey, @NO, OBJC_ASSOCIATION_RETAIN);
+    [CATransaction begin];
+    [CATransaction setAnimationDuration:0.15];
+    [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
+    overlay.transform = CATransform3DMakeScale(1.15f, 1.3f, 1.0f);
+    overlay.opacity = 1.0f;
+    [CATransaction commit];
+}
+
+static void HBTHandleTouchUp(UIView *pillView) {
+    CAGradientLayer *overlay = objc_getAssociatedObject(pillView, HBTOverlayKey);
+    if (!overlay) return;
+    [CATransaction begin];
+    [CATransaction setAnimationDuration:0.2];
+    [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
+    overlay.transform = CATransform3DIdentity;
+    [CATransaction commit];
+}
+
+// ---- Idle dim: called from the existing 1s poll tick.
+static void HBTApplyIdleDim(UIView *pillView) {
+    CAGradientLayer *overlay = objc_getAssociatedObject(pillView, HBTOverlayKey);
+    if (!overlay || overlay.hidden || !hbtEnabled) return;
+    BOOL alreadyDimmed = [objc_getAssociatedObject(pillView, HBTDimmedKey) boolValue];
+    CFTimeInterval idleFor = CFAbsoluteTimeGetCurrent() - hbtLastTouchTime;
+    if (!alreadyDimmed && idleFor >= kHBTIdleDimDelay) {
+        objc_setAssociatedObject(pillView, HBTDimmedKey, @YES, OBJC_ASSOCIATION_RETAIN);
+        [CATransaction begin];
+        [CATransaction setAnimationDuration:0.6];
+        overlay.opacity = kHBTDimmedOpacity;
+        [CATransaction commit];
+    }
+}
+
 // ---- Diagnostic: dump candidate class names once at launch ----
 static void HBTDumpCandidateClasses(void) {
     int count = objc_getClassList(NULL, 0);
@@ -236,6 +279,24 @@ static void HBTTrackView(UIView *pillView) {
     }
 }
 
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    %orig;
+    hbtLastTouchTime = CFAbsoluteTimeGetCurrent();
+    HBTHandleTouchDown(self);
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    %orig;
+    hbtLastTouchTime = CFAbsoluteTimeGetCurrent();
+    HBTHandleTouchUp(self);
+}
+
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
+    %orig;
+    hbtLastTouchTime = CFAbsoluteTimeGetCurrent();
+    HBTHandleTouchUp(self);
+}
+
 %end
 
 static void HBTReloadCallback(CFNotificationCenterRef center, void *observer,
@@ -249,6 +310,7 @@ static void HBTPollTick(CFRunLoopTimerRef timer, void *info) {
     HBTLoadPrefs();
     for (UIView *v in hbtTrackedViews) {
         HBTApplyOverlay(v);
+        HBTApplyIdleDim(v);
     }
 }
 
