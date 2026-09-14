@@ -259,6 +259,60 @@ static void HBTTrackView(UIView *pillView) {
     [hbtTrackedViews addObject:pillView];
 }
 
+// ---- Touch detection via our own gesture recognizer, added alongside
+// whatever native recognizers already exist. touchesBegan/Ended overrides on
+// the view are unreliable here since a gesture recognizer upstream likely
+// claims the touch first. minimumPressDuration=0 fires on touch-down; we
+// don't cancel or delay anything native, so this is purely observational.
+@interface HBTTouchWatcher : NSObject <UIGestureRecognizerDelegate>
+@end
+
+@implementation HBTTouchWatcher
+
+- (void)hbtHandle:(UILongPressGestureRecognizer *)gr {
+    UIView *view = gr.view;
+    if (!view) return;
+    switch (gr.state) {
+        case UIGestureRecognizerStateBegan:
+            hbtLastTouchTime = CFAbsoluteTimeGetCurrent();
+            HBTHandleTouchDown(view);
+            break;
+        case UIGestureRecognizerStateEnded:
+        case UIGestureRecognizerStateCancelled:
+        case UIGestureRecognizerStateFailed:
+            hbtLastTouchTime = CFAbsoluteTimeGetCurrent();
+            HBTHandleTouchUp(view);
+            break;
+        default:
+            break;
+    }
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer
+    shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    return YES;
+}
+
+@end
+
+static HBTTouchWatcher *hbtTouchWatcher;
+static const void *HBTWatcherAttachedKey = &HBTWatcherAttachedKey;
+
+static void HBTAttachTouchWatcher(UIView *pillView) {
+    if (objc_getAssociatedObject(pillView, HBTWatcherAttachedKey)) return;
+    objc_setAssociatedObject(pillView, HBTWatcherAttachedKey, @YES, OBJC_ASSOCIATION_RETAIN);
+
+    if (!hbtTouchWatcher) hbtTouchWatcher = [HBTTouchWatcher new];
+    UILongPressGestureRecognizer *gr =
+        [[UILongPressGestureRecognizer alloc] initWithTarget:hbtTouchWatcher action:@selector(hbtHandle:)];
+    gr.minimumPressDuration = 0;
+    gr.cancelsTouchesInView = NO;
+    gr.delaysTouchesBegan = NO;
+    gr.delaysTouchesEnded = NO;
+    gr.delegate = hbtTouchWatcher;
+    [pillView addGestureRecognizer:gr];
+}
+
 // ---- Known hook target, confirmed present via on-device classdump ----
 @interface SBHomeGrabberView : UIView
 @end
@@ -268,6 +322,7 @@ static void HBTTrackView(UIView *pillView) {
 - (void)layoutSubviews {
     %orig;
     HBTTrackView(self);
+    HBTAttachTouchWatcher(self);
     HBTApplyOverlay(self);
 }
 
@@ -275,26 +330,9 @@ static void HBTTrackView(UIView *pillView) {
     %orig;
     if (self.window) {
         HBTTrackView(self);
+        HBTAttachTouchWatcher(self);
         HBTApplyOverlay(self);
     }
-}
-
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    %orig;
-    hbtLastTouchTime = CFAbsoluteTimeGetCurrent();
-    HBTHandleTouchDown(self);
-}
-
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-    %orig;
-    hbtLastTouchTime = CFAbsoluteTimeGetCurrent();
-    HBTHandleTouchUp(self);
-}
-
-- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
-    %orig;
-    hbtLastTouchTime = CFAbsoluteTimeGetCurrent();
-    HBTHandleTouchUp(self);
 }
 
 %end
