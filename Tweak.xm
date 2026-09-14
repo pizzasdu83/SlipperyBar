@@ -83,8 +83,8 @@ static const void *HBTOverlayKey = &HBTOverlayKey;
 static const void *HBTDimmedKey = &HBTDimmedKey;
 
 static CFAbsoluteTime hbtLastTouchTime = 0;
-static const CFTimeInterval kHBTIdleDimDelay = 3.0;
-static const CGFloat kHBTDimmedOpacity = 0.35f;
+static const CFTimeInterval kHBTIdleDimDelay = 1.5;
+static const CGFloat kHBTDimmedOpacity = 0.0f;
 
 static void HBTApplyOverlay(UIView *pillView) {
     if (!pillView) return;
