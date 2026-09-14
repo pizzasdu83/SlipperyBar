@@ -80,12 +80,17 @@ static void HBTGradientPointsForAngle(CGFloat degrees, CGPoint *start, CGPoint *
 
 // ---- Overlay that paints the pill shape ----
 static const void *HBTOverlayKey = &HBTOverlayKey;
+static const void *HBTOrigFilterKey = &HBTOrigFilterKey;
 
 static void HBTApplyOverlay(UIView *pillView) {
     if (!pillView) return;
 
     CAGradientLayer *overlay = objc_getAssociatedObject(pillView, HBTOverlayKey);
     if (!hbtEnabled) {
+        id origFilter = objc_getAssociatedObject(pillView, HBTOrigFilterKey);
+        if (origFilter) {
+            pillView.layer.compositingFilter = [origFilter isKindOfClass:[NSNull class]] ? nil : origFilter;
+        }
         if (overlay && !overlay.hidden) {
             [CATransaction begin];
             [CATransaction setCompletionBlock:^{ overlay.hidden = YES; }];
@@ -108,6 +113,19 @@ static void HBTApplyOverlay(UIView *pillView) {
         [pillView.layer addSublayer:overlay];
         objc_setAssociatedObject(pillView, HBTOverlayKey, overlay, OBJC_ASSOCIATION_RETAIN);
     }
+
+    // The parent view's own layer likely carries a "luma dodge" style
+    // compositing filter that produces the adaptive black/white look - and
+    // that filter applies to everything inside its layer tree, including our
+    // colored sublayer, silently overriding whatever color we set. Strip it
+    // while our tint is active (remembering the original so we can put it
+    // back if the tweak gets disabled).
+    if (!objc_getAssociatedObject(pillView, HBTOrigFilterKey)) {
+        id origFilter = pillView.layer.compositingFilter ?: [NSNull null];
+        objc_setAssociatedObject(pillView, HBTOrigFilterKey, origFilter, OBJC_ASSOCIATION_RETAIN);
+    }
+    pillView.layer.compositingFilter = nil;
+
     BOOL wasHidden = overlay.hidden;
     overlay.hidden = NO;
     // Force front-most regardless of when/how native content gets (re)added to
