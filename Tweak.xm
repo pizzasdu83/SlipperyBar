@@ -80,17 +80,12 @@ static void HBTGradientPointsForAngle(CGFloat degrees, CGPoint *start, CGPoint *
 
 // ---- Overlay that paints the pill shape ----
 static const void *HBTOverlayKey = &HBTOverlayKey;
-static const void *HBTOrigFilterKey = &HBTOrigFilterKey;
 
 static void HBTApplyOverlay(UIView *pillView) {
     if (!pillView) return;
 
     CAGradientLayer *overlay = objc_getAssociatedObject(pillView, HBTOverlayKey);
     if (!hbtEnabled) {
-        id origFilter = objc_getAssociatedObject(pillView, HBTOrigFilterKey);
-        if (origFilter) {
-            pillView.layer.compositingFilter = [origFilter isKindOfClass:[NSNull class]] ? nil : origFilter;
-        }
         if (overlay && !overlay.hidden) {
             [CATransaction begin];
             [CATransaction setCompletionBlock:^{ overlay.hidden = YES; }];
@@ -106,6 +101,7 @@ static void HBTApplyOverlay(UIView *pillView) {
         for (UIView *sub in pillView.subviews) sub.hidden = NO;
         return;
     }
+
     BOOL isNewOverlay = (overlay == nil);
     if (isNewOverlay) {
         overlay = [CAGradientLayer layer];
@@ -113,19 +109,6 @@ static void HBTApplyOverlay(UIView *pillView) {
         [pillView.layer addSublayer:overlay];
         objc_setAssociatedObject(pillView, HBTOverlayKey, overlay, OBJC_ASSOCIATION_RETAIN);
     }
-
-    // The parent view's own layer likely carries a "luma dodge" style
-    // compositing filter that produces the adaptive black/white look - and
-    // that filter applies to everything inside its layer tree, including our
-    // colored sublayer, silently overriding whatever color we set. Strip it
-    // while our tint is active (remembering the original so we can put it
-    // back if the tweak gets disabled).
-    if (!objc_getAssociatedObject(pillView, HBTOrigFilterKey)) {
-        id origFilter = pillView.layer.compositingFilter ?: [NSNull null];
-        objc_setAssociatedObject(pillView, HBTOrigFilterKey, origFilter, OBJC_ASSOCIATION_RETAIN);
-    }
-    pillView.layer.compositingFilter = nil;
-
     BOOL wasHidden = overlay.hidden;
     overlay.hidden = NO;
     // Force front-most regardless of when/how native content gets (re)added to
@@ -137,34 +120,22 @@ static void HBTApplyOverlay(UIView *pillView) {
     // pill stays visible underneath until its own fade-out finishes. These are
     // purely cosmetic child views; SBHomeGrabberView itself (not these
     // children) is what handles the system gesture, so hiding them is safe.
-    // We read their frame BEFORE hiding, since that frame is exactly what the
-    // system already sized for this orientation/mode/device (iPad split view,
-    // rotation, etc.) - so we adapt to it instead of guessing a fixed size.
-    UIView *nativePill = pillView.subviews.firstObject;
-    CGRect nativeFrame = nativePill ? nativePill.frame : CGRectNull;
     for (UIView *sub in pillView.subviews) sub.hidden = YES;
 
-    // SAFETY: never trust pillView.bounds (or the native subview's frame)
-    // blindly. On-device, the hooked view can temporarily grow far beyond the
-    // visible pill (e.g. to host a larger touch-catching area for system
-    // gestures). If we ever painted that full area, it would blank out
-    // whatever is behind it - including foreground app content. So we clamp
-    // to a sane maximum regardless of source.
+    // SAFETY: never trust pillView.bounds directly. On-device, the hooked view
+    // can temporarily grow far beyond the visible pill (e.g. to host a larger
+    // touch-catching area for system gestures). If we ever painted that full
+    // area, it would blank out whatever is behind it - including foreground
+    // app content. So we always compute a small pill-shaped rect ourselves,
+    // anchored at the bottom-center of whatever bounds we're given, capped at
+    // a sane maximum size, and never larger than the view actually is.
+    CGFloat maxPillWidth = 140.0f;
+    CGFloat pillHeight = 5.0f;
     CGFloat viewW = pillView.bounds.size.width;
     CGFloat viewH = pillView.bounds.size.height;
-    CGRect targetRect;
-    BOOL nativeFrameLooksSane = !CGRectIsNull(nativeFrame) &&
-        nativeFrame.size.width > 0 && nativeFrame.size.width <= 300 &&
-        nativeFrame.size.height > 0 && nativeFrame.size.height <= 20;
-    if (nativeFrameLooksSane) {
-        targetRect = nativeFrame;
-    } else {
-        CGFloat maxPillWidth = 140.0f;
-        CGFloat pillHeight = 5.0f;
-        CGFloat w = MIN(maxPillWidth, viewW);
-        CGFloat h = MIN(pillHeight, viewH);
-        targetRect = CGRectMake((viewW - w) * 0.5f, MAX(0, viewH - h - 8.0f), w, h);
-    }
+    CGFloat w = MIN(maxPillWidth, viewW);
+    CGFloat h = MIN(pillHeight, viewH);
+    CGRect targetRect = CGRectMake((viewW - w) * 0.5f, MAX(0, viewH - h - 8.0f), w, h);
 
     NSArray *newColors;
     CGPoint newStart, newEnd;
@@ -177,15 +148,14 @@ static void HBTApplyOverlay(UIView *pillView) {
         newEnd = CGPointMake(1, 0.5f);
     }
 
-    // Animate frame/color/corner-radius changes smoothly on updates - but on
-    // first appearance, set them immediately (no animation) first. Animating
-    // "colors" from its default nil value can otherwise fail to render at
-    // all instead of just skipping the transition.
+    // First appearance: set geometry/colors immediately (no animation), then
+    // fade opacity in. Animating "colors" from its default nil value can
+    // otherwise fail to render at all instead of just skipping the transition.
     if (isNewOverlay) {
         [CATransaction begin];
         [CATransaction setDisableActions:YES];
         overlay.frame = targetRect;
-        overlay.cornerRadius = targetRect.size.height * 0.5f;
+        overlay.cornerRadius = h * 0.5f;
         overlay.colors = newColors;
         overlay.startPoint = newStart;
         overlay.endPoint = newEnd;
@@ -201,7 +171,7 @@ static void HBTApplyOverlay(UIView *pillView) {
         [CATransaction setAnimationTimingFunction:
             [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
         overlay.frame = targetRect;
-        overlay.cornerRadius = targetRect.size.height * 0.5f;
+        overlay.cornerRadius = h * 0.5f;
         overlay.colors = newColors;
         overlay.startPoint = newStart;
         overlay.endPoint = newEnd;
@@ -232,60 +202,6 @@ static void HBTDumpCandidateClasses(void) {
     [log writeToFile:HBT_LOGPATH atomically:YES encoding:NSUTF8StringEncoding error:nil];
 }
 
-// ---- Diagnostic: dump the real view/layer structure around the pill once,
-// so we can see actual classes/filters/colors instead of guessing further.
-#define HBT_VIEWDUMP_PATH @"/var/mobile/Documents/HomeBarTint-viewdump.txt"
-static BOOL hbtDidDumpViewHierarchy = NO;
-
-static NSString *HBTDescribeFilters(CALayer *layer) {
-    NSMutableString *s = [NSMutableString string];
-    if (layer.compositingFilter) [s appendFormat:@"compositingFilter=%@ ", layer.compositingFilter];
-    if (layer.filters.count) [s appendFormat:@"filters=%@ ", layer.filters];
-    if (layer.mask) [s appendFormat:@"hasMask=YES "];
-    return s;
-}
-
-static void HBTDumpViewRecursive(UIView *view, NSMutableString *out, NSInteger depth) {
-    if (!view || depth > 6) return;
-    NSString *indent = [@"" stringByPaddingToLength:(NSUInteger)depth * 2 withString:@" " startingAtIndex:0];
-    [out appendFormat:@"%@%@ frame=%@ alpha=%.2f hidden=%d bg=%@ layer.opacity=%.2f layer.bg=%@ %@sublayers=%lu\n",
-        indent, NSStringFromClass([view class]), NSStringFromCGRect(view.frame), view.alpha, view.hidden,
-        view.backgroundColor, view.layer.opacity, view.layer.backgroundColor,
-        HBTDescribeFilters(view.layer), (unsigned long)view.layer.sublayers.count];
-    for (CALayer *sub in view.layer.sublayers ?: @[]) {
-        BOOL isBackingLayerOfSubview = NO;
-        for (UIView *v in view.subviews) if (v.layer == sub) { isBackingLayerOfSubview = YES; break; }
-        if (!isBackingLayerOfSubview) {
-            [out appendFormat:@"%@  [layer] %@ opacity=%.2f %@\n",
-                indent, [sub class], sub.opacity, HBTDescribeFilters(sub)];
-        }
-    }
-    for (UIView *sub in view.subviews) {
-        HBTDumpViewRecursive(sub, out, depth + 1);
-    }
-}
-
-static void HBTDumpViewHierarchyOnce(UIView *pillView) {
-    if (hbtDidDumpViewHierarchy) return;
-    hbtDidDumpViewHierarchy = YES;
-
-    NSMutableString *out = [NSMutableString string];
-    [out appendString:@"=== Ancestors (outward) ===\n"];
-    UIView *ancestor = pillView.superview;
-    NSInteger up = 0;
-    while (ancestor && up < 3) {
-        [out appendFormat:@"^%ld %@ frame=%@ layer.opacity=%.2f %@\n",
-            (long)up, NSStringFromClass([ancestor class]), NSStringFromCGRect(ancestor.frame),
-            ancestor.layer.opacity, HBTDescribeFilters(ancestor.layer)];
-        ancestor = ancestor.superview;
-        up++;
-    }
-    [out appendString:@"\n=== Pill view + descendants ===\n"];
-    HBTDumpViewRecursive(pillView, out, 0);
-
-    [out writeToFile:HBT_VIEWDUMP_PATH atomically:YES encoding:NSUTF8StringEncoding error:nil];
-}
-
 // ---- Track every live pill view so a polling fallback can re-apply colors
 // even if the darwin notification never reaches SpringBoard (this device's
 // SpringBoard log shows libSandy sandbox-extension issues, so cross-process
@@ -309,7 +225,6 @@ static void HBTTrackView(UIView *pillView) {
 - (void)layoutSubviews {
     %orig;
     HBTTrackView(self);
-    HBTDumpViewHierarchyOnce(self);
     HBTApplyOverlay(self);
 }
 
