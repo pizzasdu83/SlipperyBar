@@ -159,21 +159,39 @@ static void HBTApplyOverlay(UIView *pillView) {
         newEnd = CGPointMake(1, 0.5f);
     }
 
-    // Animate frame/color/corner-radius changes smoothly instead of snapping,
-    // and fade in on first appearance (or when re-enabled).
-    [CATransaction begin];
-    [CATransaction setAnimationDuration:0.25];
-    [CATransaction setAnimationTimingFunction:
-        [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
-    overlay.frame = targetRect;
-    overlay.cornerRadius = targetRect.size.height * 0.5f;
-    overlay.colors = newColors;
-    overlay.startPoint = newStart;
-    overlay.endPoint = newEnd;
-    if (isNewOverlay || wasHidden) {
+    // Animate frame/color/corner-radius changes smoothly on updates - but on
+    // first appearance, set them immediately (no animation) first. Animating
+    // "colors" from its default nil value can otherwise fail to render at
+    // all instead of just skipping the transition.
+    if (isNewOverlay) {
+        [CATransaction begin];
+        [CATransaction setDisableActions:YES];
+        overlay.frame = targetRect;
+        overlay.cornerRadius = targetRect.size.height * 0.5f;
+        overlay.colors = newColors;
+        overlay.startPoint = newStart;
+        overlay.endPoint = newEnd;
+        [CATransaction commit];
+
+        [CATransaction begin];
+        [CATransaction setAnimationDuration:0.25];
         overlay.opacity = 1.0f;
+        [CATransaction commit];
+    } else {
+        [CATransaction begin];
+        [CATransaction setAnimationDuration:0.25];
+        [CATransaction setAnimationTimingFunction:
+            [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
+        overlay.frame = targetRect;
+        overlay.cornerRadius = targetRect.size.height * 0.5f;
+        overlay.colors = newColors;
+        overlay.startPoint = newStart;
+        overlay.endPoint = newEnd;
+        if (wasHidden) {
+            overlay.opacity = 1.0f;
+        }
+        [CATransaction commit];
     }
-    [CATransaction commit];
 }
 
 // ---- Diagnostic: dump candidate class names once at launch ----
