@@ -189,61 +189,27 @@ static void HBTApplyOverlay(UIView *pillView) {
 
 // ---- Touch feedback: slight scale-up while pressed, back to normal on release.
 static void HBTHandleTouchDown(UIView *pillView) {
-    if (!pillView) return;
-    
     CAGradientLayer *overlay = objc_getAssociatedObject(pillView, HBTOverlayKey);
-    if (!overlay) {
-        // Si l'overlay n'existe pas encore, on le crée/applique immédiatement.
-        HBTApplyOverlay(pillView);
-        overlay = objc_getAssociatedObject(pillView, HBTOverlayKey);
-    }
-    
-    if (!overlay) return;
-    
-    // La barre vient d'être touchée :
-    // - elle doit redevenir visible immédiatement
-    // - elle ne doit plus être considérée comme "dimmed"
-    // - le délai de disparition repart à zéro
-    hbtLastTouchTime = CFAbsoluteTimeGetCurrent();
+    if (!overlay || overlay.hidden) return;
     objc_setAssociatedObject(pillView, HBTDimmedKey, @NO, OBJC_ASSOCIATION_RETAIN);
-    
     [CATransaction begin];
     [CATransaction setAnimationDuration:0.15];
-    [CATransaction setAnimationTimingFunction:
-        [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
-    
-    overlay.hidden = NO;
-    overlay.opacity = 1.0f;
+    [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
     overlay.transform = CATransform3DMakeScale(1.15f, 1.3f, 1.0f);
-    
+    overlay.opacity = 1.0f;
     [CATransaction commit];
-    
-    
 }
 
 static void HBTHandleTouchUp(UIView *pillView) {
     CAGradientLayer *overlay = objc_getAssociatedObject(pillView, HBTOverlayKey);
     if (!overlay) return;
-    
-    // Le relâchement ne cache pas la barre.
-    // Elle restera visible jusqu'à ce que HBTApplyIdleDim()
-    // détecte 1,5 seconde d'inactivité.
-    
-    hbtLastTouchTime = CFAbsoluteTimeGetCurrent();
-    objc_setAssociatedObject(pillView, HBTDimmedKey, @NO, OBJC_ASSOCIATION_RETAIN);
-    
     [CATransaction begin];
     [CATransaction setAnimationDuration:0.2];
-    [CATransaction setAnimationTimingFunction:
-        [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
-    
+    [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
     overlay.transform = CATransform3DIdentity;
-    overlay.opacity = 1.0f;
-    
     [CATransaction commit];
-    
-    
 }
+
 // ---- Idle dim: called from the existing 1s poll tick.
 static void HBTApplyIdleDim(UIView *pillView) {
     CAGradientLayer *overlay = objc_getAssociatedObject(pillView, HBTOverlayKey);
@@ -325,6 +291,32 @@ static void HBTTrackView(UIView *pillView) {
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer
     shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
     return YES;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    return YES;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveEvent:(UIEvent *)event {
+    return YES;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceivePress:(UIPress *)press {
+    return YES;
+}
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    return YES;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer
+    shouldRequireFailureOfGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    return NO;
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer
+    shouldBeRequiredToFailByGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    return NO;
 }
 
 @end
