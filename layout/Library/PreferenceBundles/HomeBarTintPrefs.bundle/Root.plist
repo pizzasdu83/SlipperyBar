@@ -259,6 +259,23 @@
 		</dict>
 
 		<dict>
+		    <key>cell</key>
+		    <string>PSSliderCell</string>
+		    <key>label</key>
+		    <string>Bar Length</string>
+		    <key>min</key>
+		    <real>0</real>
+		    <key>max</key>
+		    <real>300</real>
+		    <key>default</key>
+		    <real>140</real>
+		    <key>key</key>
+		    <string>BarWidth</string>
+		    <key>defaults</key>
+		    <string>com.pizzasdu83.homebartint</string>
+		</dict>
+
+		<dict>
 			<key>cell</key>
 			<string>PSEditTextCell</string>
 			<key>label</key>
