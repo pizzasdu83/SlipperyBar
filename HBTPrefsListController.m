@@ -42,12 +42,27 @@
     if (selected) [self.table deselectRowAtIndexPath:selected animated:YES];
 }
 
+- (void)openButterfly {
+    NSURL *url = [NSURL URLWithString:@"https://youtu.be/dtCZMge7oHQ"];
+    if (url) [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+    NSIndexPath *selected = self.table.indexPathForSelectedRow;
+    if (selected) [self.table deselectRowAtIndexPath:selected animated:YES];
+}
+
+- (void)openMeInHalf {
+    NSURL *url = [NSURL URLWithString:@"https://discord.gg/e4zY6NrX"];
+    if (url) [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+    NSIndexPath *selected = self.table.indexPathForSelectedRow;
+    if (selected) [self.table deselectRowAtIndexPath:selected animated:YES];
+}
+
 - (void)confirmResetSettings {
     NSIndexPath *selected = self.table.indexPathForSelectedRow;
     if (selected) [self.table deselectRowAtIndexPath:selected animated:YES];
 
     UIAlertController *alert = [UIAlertController
         alertControllerWithTitle:@"Reset All Settings?"
+        style:UIAlertActionStyleDestructive
         message:@"This restores Slippery Bar to its default colors, opacity and mode."
         preferredStyle:UIAlertControllerStyleAlert];
 
