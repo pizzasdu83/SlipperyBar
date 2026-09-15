@@ -56,22 +56,39 @@
     if (selected) [self.table deselectRowAtIndexPath:selected animated:YES];
 }
 
+- (UITableViewCell *)tableView:(UITableView *)tableView
+         cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+
+	UITableViewCell *cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
+
+	if ([cell.textLabel.text isEqualToString:@"☢️ Reset All Settings ☢️"]) {
+		cell.textLabel.textColor = [UIColor redColor];
+	}
+
+	return cell;
+}
+
 - (void)confirmResetSettings {
     NSIndexPath *selected = self.table.indexPathForSelectedRow;
     if (selected) [self.table deselectRowAtIndexPath:selected animated:YES];
 
     UIAlertController *alert = [UIAlertController
         alertControllerWithTitle:@"Reset All Settings?"
-        style:UIAlertActionStyleDestructive
         message:@"This restores Slippery Bar to its default colors, opacity and mode."
         preferredStyle:UIAlertControllerStyleAlert];
 
     __weak HBTPrefsListController *weakSelf = self;
-    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Reset" style:UIAlertActionStyleDestructive
+
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel"
+        style:UIAlertActionStyleCancel
+        handler:nil]];
+
+    [alert addAction:[UIAlertAction actionWithTitle:@"Reset"
+        style:UIAlertActionStyleDestructive
         handler:^(UIAlertAction *action) {
             [weakSelf hbtPerformReset];
         }]];
+
     [self presentViewController:alert animated:YES completion:nil];
 }
 
