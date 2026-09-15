@@ -282,13 +282,15 @@
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
+			<key>label</key>
+		    <string>Bar Length</string>
 		</dict>
 
 		<dict>
 		    <key>cell</key>
 		    <string>PSSliderCell</string>
 		    <key>label</key>
-		    <string>Bar Length</string>
+		    <string>BarLength</string>
 		    <key>min</key>
 		    <real>0</real>
 		    <key>max</key>
