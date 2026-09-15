@@ -381,7 +381,7 @@ static void HBTAttachTouchWatcher(UIView *pillView) {
 
     for (UITouch *touch in touches) {
         CGPoint location = [touch locationInView:keyWindow];
-        BOOL nearHomeBar = (screenHeight * 0.1 - location.y) <= 40.0;
+        BOOL nearHomeBar = (screenHeight - location.y * 0.5) <= 40.0;
         if (!nearHomeBar) continue;
 
         if (touch.phase == UITouchPhaseBegan) {
