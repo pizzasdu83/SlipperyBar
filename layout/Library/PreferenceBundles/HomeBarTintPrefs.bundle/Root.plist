@@ -48,6 +48,53 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
+			<string>Opacity</string>
+			<key>footerText</key>
+			<string>Normal is used while active; Sleep is used after a few seconds without touching the bar.</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSSliderCell</string>
+			<key>label</key>
+			<string>Normal</string>
+			<key>key</key>
+			<string>NormalOpacity</string>
+			<key>default</key>
+			<real>100</real>
+			<key>min</key>
+			<real>10</real>
+			<key>max</key>
+			<real>100</real>
+			<key>defaults</key>
+			<string>com.pizzasdu83.homebartint</string>
+			<key>PostNotification</key>
+			<string>com.pizzasdu83.homebartint/reload</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSSliderCell</string>
+			<key>label</key>
+			<string>Sleep</string>
+			<key>key</key>
+			<string>DimmedOpacity</string>
+			<key>default</key>
+			<real>40</real>
+			<key>min</key>
+			<real>0</real>
+			<key>max</key>
+			<real>100</real>
+			<key>defaults</key>
+			<string>com.pizzasdu83.homebartint</string>
+			<key>PostNotification</key>
+			<string>com.pizzasdu83.homebartint/reload</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
 			<string>Color 1</string>
 		</dict>
 
@@ -226,6 +273,20 @@
 			<string>com.pizzasdu83.homebartint</string>
 			<key>PostNotification</key>
 			<string>com.pizzasdu83.homebartint/reload</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSLinkCell</string>
+			<key>label</key>
+			<string>⚠️ Reset All Settings</string>
+			<key>action</key>
+			<string>confirmResetSettings</string>
 		</dict>
 
 		<dict>
