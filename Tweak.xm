@@ -138,7 +138,7 @@ static void HBTApplyOverlay(UIView *pillView) {
     // app content. So we always compute a small pill-shaped rect ourselves,
     // anchored at the bottom-center of whatever bounds we're given, capped at
     // a sane maximum size, and never larger than the view actually is.
-    CGFloat maxPillWidth = 140.0f;
+    CGFloat maxPillWidth = [([[[NSUserDefaults alloc] initWithSuiteName:@"com.pizzasdu83.homebartint"] objectForKey:@"BarWidth"] ?: @140) doubleValue];
     CGFloat pillHeight = 5.0f;
     CGFloat viewW = pillView.bounds.size.width;
     CGFloat viewH = pillView.bounds.size.height;
