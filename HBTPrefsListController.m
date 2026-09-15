@@ -42,4 +42,43 @@
     if (selected) [self.table deselectRowAtIndexPath:selected animated:YES];
 }
 
+- (void)confirmResetSettings {
+    NSIndexPath *selected = self.table.indexPathForSelectedRow;
+    if (selected) [self.table deselectRowAtIndexPath:selected animated:YES];
+
+    UIAlertController *alert = [UIAlertController
+        alertControllerWithTitle:@"Reset All Settings?"
+        message:@"This restores Slippery Bar to its default colors, opacity and mode."
+        preferredStyle:UIAlertControllerStyleAlert];
+
+    __weak HBTPrefsListController *weakSelf = self;
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Reset" style:UIAlertActionStyleDestructive
+        handler:^(UIAlertAction *action) {
+            [weakSelf hbtPerformReset];
+        }]];
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+- (void)hbtPerformReset {
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"com.pizzasdu83.homebartint"];
+    NSArray<NSString *> *keys = @[
+        @"Enabled", @"GradientEnabled",
+        @"Color1R", @"Color1G", @"Color1B", @"Color1Hex",
+        @"Color2R", @"Color2G", @"Color2B", @"Color2Hex",
+        @"Angle", @"NormalOpacity", @"DimmedOpacity",
+    ];
+    for (NSString *key in keys) [defaults removeObjectForKey:key];
+    [defaults synchronize];
+
+    CFNotificationCenterPostNotification(
+        CFNotificationCenterGetDarwinNotifyCenter(),
+        CFSTR("com.pizzasdu83.homebartint/reload"), NULL, NULL, YES);
+
+    // Force this page to rebuild its rows from scratch so the sliders/switches
+    // reflect the restored defaults immediately instead of stale values.
+    _specifiers = nil;
+    [self reloadSpecifiers];
+}
+
 @end

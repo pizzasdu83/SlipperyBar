@@ -13,6 +13,8 @@ static BOOL hbtIsGradient = NO;
 static UIColor *hbtColor1;
 static UIColor *hbtColor2;
 static CGFloat hbtAngleDegrees = 0.0f;
+static CGFloat hbtNormalOpacity = 1.0f;
+static CGFloat hbtDimmedOpacityPref = 0.4f;
 
 static CGFloat HBTReadChannel(CFStringRef key, CGFloat fallback) {
     CFPropertyListRef ref = CFPreferencesCopyAppValue(key, HBT_DOMAIN);
@@ -68,6 +70,9 @@ static void HBTLoadPrefs(void) {
     CFPropertyListRef angleRef = CFPreferencesCopyAppValue(CFSTR("Angle"), HBT_DOMAIN);
     hbtAngleDegrees = angleRef ? [(__bridge id)angleRef floatValue] : 0.0f;
     if (angleRef) CFRelease(angleRef);
+
+    hbtNormalOpacity = HBTReadChannel(CFSTR("NormalOpacity"), 100.0f) / 100.0f;
+    hbtDimmedOpacityPref = HBTReadChannel(CFSTR("DimmedOpacity"), 40.0f) / 100.0f;
 }
 
 // Converts an angle in degrees to CAGradientLayer start/end points (unit square).
@@ -84,7 +89,6 @@ static const void *HBTDimmedKey = &HBTDimmedKey;
 
 static CFAbsoluteTime hbtLastTouchTime = 0;
 static const CFTimeInterval kHBTIdleDimDelay = 1.5;
-static const CGFloat kHBTDimmedOpacity = 0.4f;
 
 static void HBTApplyOverlay(UIView *pillView) {
     if (!pillView) return;
@@ -168,7 +172,7 @@ static void HBTApplyOverlay(UIView *pillView) {
 
         [CATransaction begin];
         [CATransaction setAnimationDuration:0.25];
-        overlay.opacity = 1.0f;
+        overlay.opacity = hbtNormalOpacity;
         [CATransaction commit];
     } else {
         [CATransaction begin];
@@ -181,7 +185,7 @@ static void HBTApplyOverlay(UIView *pillView) {
         overlay.startPoint = newStart;
         overlay.endPoint = newEnd;
         if (wasHidden) {
-            overlay.opacity = 1.0f;
+            overlay.opacity = hbtNormalOpacity;
         }
         [CATransaction commit];
     }
@@ -196,7 +200,7 @@ static void HBTHandleTouchDown(UIView *pillView) {
     [CATransaction setAnimationDuration:0.15];
     [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
     overlay.transform = CATransform3DMakeScale(1.15f, 1.3f, 1.0f);
-    overlay.opacity = 1.0f;
+    overlay.opacity = hbtNormalOpacity;
     [CATransaction commit];
 }
 
@@ -220,7 +224,7 @@ static void HBTApplyIdleDim(UIView *pillView) {
         objc_setAssociatedObject(pillView, HBTDimmedKey, @YES, OBJC_ASSOCIATION_RETAIN);
         [CATransaction begin];
         [CATransaction setAnimationDuration:0.6];
-        overlay.opacity = kHBTDimmedOpacity;
+        overlay.opacity = hbtDimmedOpacityPref;
         [CATransaction commit];
     }
 }
