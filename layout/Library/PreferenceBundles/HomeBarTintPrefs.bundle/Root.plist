@@ -284,7 +284,7 @@
 			<key>cell</key>
 			<string>PSLinkCell</string>
 			<key>label</key>
-			<string>⚠️ Reset All Settings</string>
+			<string>☢️ Reset All Settings ☢️</string>
 			<key>action</key>
 			<string>confirmResetSettings</string>
 		</dict>
@@ -303,6 +303,28 @@
 			<string>github.png</string>
 			<key>action</key>
 			<string>openSourceRepository</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSLinkCell</string>
+			<key>label</key>
+			<string>More</string>
+			<key>icon</key>
+			<string>vibin.png</string>
+			<key>action</key>
+			<string>openButterfly</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSLinkCell</string>
+			<key>label</key>
+			<string>Address me on discord</string>
+			<key>icon</key>
+			<string>discord.png</string>
+			<key>action</key>
+			<string>openMeInHalf</string>
 		</dict>
 
 	</array>
