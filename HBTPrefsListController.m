@@ -56,17 +56,6 @@
     if (selected) [self.table deselectRowAtIndexPath:selected animated:YES];
 }
 
-- (void)tableView:(UITableView *)tableView
- willDisplayCell:(UITableViewCell *)cell
-forRowAtIndexPath:(NSIndexPath *)indexPath {
-
-    [super tableView:tableView willDisplayCell:cell forRowAtIndexPath:indexPath];
-
-    if ([cell.textLabel.text isEqualToString:@"☢️ Reset All Settings ☢️"]) {
-        cell.textLabel.textColor = [UIColor redColor];
-    }
-}
-
 - (void)confirmResetSettings {
     NSIndexPath *selected = self.table.indexPathForSelectedRow;
     if (selected) [self.table deselectRowAtIndexPath:selected animated:YES];
@@ -77,17 +66,11 @@ forRowAtIndexPath:(NSIndexPath *)indexPath {
         preferredStyle:UIAlertControllerStyleAlert];
 
     __weak HBTPrefsListController *weakSelf = self;
-
-    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel"
-        style:UIAlertActionStyleCancel
-        handler:nil]];
-
-    [alert addAction:[UIAlertAction actionWithTitle:@"Reset"
-        style:UIAlertActionStyleDestructive
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Reset" style:UIAlertActionStyleDestructive
         handler:^(UIAlertAction *action) {
             [weakSelf hbtPerformReset];
         }]];
-
     [self presentViewController:alert animated:YES completion:nil];
 }
 
