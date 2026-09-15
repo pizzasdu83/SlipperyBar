@@ -56,16 +56,15 @@
     if (selected) [self.table deselectRowAtIndexPath:selected animated:YES];
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView
-         cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView
+ willDisplayCell:(UITableViewCell *)cell
+forRowAtIndexPath:(NSIndexPath *)indexPath {
 
-	UITableViewCell *cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
+    [super tableView:tableView willDisplayCell:cell forRowAtIndexPath:indexPath];
 
-	if ([cell.textLabel.text isEqualToString:@"☢️ Reset All Settings ☢️"]) {
-		cell.textLabel.textColor = [UIColor redColor];
-	}
-
-	return cell;
+    if ([cell.textLabel.text isEqualToString:@"☢️ Reset All Settings ☢️"]) {
+        cell.textLabel.textColor = [UIColor redColor];
+    }
 }
 
 - (void)confirmResetSettings {
