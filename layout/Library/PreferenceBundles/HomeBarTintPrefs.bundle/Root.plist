@@ -285,13 +285,6 @@
 		</dict>
 
 		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>label</key>
-			<string>Bar lenght</string>
-		</dict>
-
-		<dict>
 		    <key>cell</key>
 		    <string>PSSliderCell</string>
 		    <key>label</key>
@@ -299,18 +292,13 @@
 		    <key>min</key>
 		    <real>0</real>
 		    <key>max</key>
-		    <real>300</real>
+		    <real>500</real>
 		    <key>default</key>
-		    <real>140</real>
+		    <real>150</real>
 		    <key>key</key>
 		    <string>BarWidth</string>
 		    <key>defaults</key>
 		    <string>com.pizzasdu83.homebartint</string>
-		</dict>
-
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
 		</dict>
 
 		<dict>
