@@ -80,7 +80,7 @@
         @"Enabled", @"GradientEnabled",
         @"Color1R", @"Color1G", @"Color1B", @"Color1Hex",
         @"Color2R", @"Color2G", @"Color2B", @"Color2Hex",
-        @"Angle", @"NormalOpacity", @"DimmedOpacity",
+        @"Angle", @"NormalOpacity", @"DimmedOpacity", @"BarWidth",
     ];
     for (NSString *key in keys) [defaults removeObjectForKey:key];
     [defaults synchronize];
