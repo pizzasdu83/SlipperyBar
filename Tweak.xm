@@ -363,6 +363,35 @@ static void HBTAttachTouchWatcher(UIView *pillView) {
 
 %end
 
+%hook UIApplication
+
+- (void)sendEvent:(UIEvent *)event {
+    %orig;
+    if (!hbtEnabled || hbtTrackedViews.count == 0) return;
+
+    NSSet<UITouch *> *touches = event.allTouches;
+    if (touches.count == 0) return;
+
+    UIWindow *keyWindow = self.keyWindow;
+    CGFloat screenHeight = keyWindow ? keyWindow.bounds.size.height : UIScreen.mainScreen.bounds.size.height;
+
+    for (UITouch *touch in touches) {
+        CGPoint location = [touch locationInView:keyWindow];
+        BOOL nearHomeBar = (screenHeight - location.y) <= 40.0;
+        if (!nearHomeBar) continue;
+
+        if (touch.phase == UITouchPhaseBegan) {
+            hbtLastTouchTime = CFAbsoluteTimeGetCurrent();
+            for (UIView *v in hbtTrackedViews) HBTHandleTouchDown(v);
+        } else if (touch.phase == UITouchPhaseEnded || touch.phase == UITouchPhaseCancelled) {
+            hbtLastTouchTime = CFAbsoluteTimeGetCurrent();
+            for (UIView *v in hbtTrackedViews) HBTHandleTouchUp(v);
+        }
+    }
+}
+
+%end
+
 static void HBTReloadCallback(CFNotificationCenterRef center, void *observer,
                                CFStringRef name, const void *object,
                                CFDictionaryRef userInfo) {
