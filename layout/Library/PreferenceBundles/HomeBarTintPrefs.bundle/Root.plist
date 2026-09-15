@@ -11,7 +11,7 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>footerText</key>
-			<string>Recolor the home indicator. When Gradient is off, Color 1 is used alone.</string>
+			<string>When Gradient is off, Color 1 is used alone.</string>
 		</dict>
 
 		<dict>
@@ -50,7 +50,7 @@
 			<key>label</key>
 			<string>Opacity</string>
 			<key>footerText</key>
-			<string>Normal is used while active; Sleep is used after a few seconds without touching the bar.</string>
+			<string>1st one is used while active; 2nd is used after a few seconds without touching the bar.</string>
 		</dict>
 
 		<dict>
@@ -96,13 +96,15 @@
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>Color 1</string>
+			<key>footerText</key>
+			<string>Hex overrides sliders.</string>
 		</dict>
 
 		<dict>
 			<key>cell</key>
 			<string>PSEditTextCell</string>
 			<key>label</key>
-			<string>Hex (overrides sliders)</string>
+			<string>Hex</string>
 			<key>key</key>
 			<string>Color1Hex</string>
 			<key>default</key>
@@ -174,14 +176,16 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>Color 2 (gradient only)</string>
+			<string>Color 2</string>
+			<key>footerText</key>
+			<string>This one can only be used when gradient mode is unabled.</string>
 		</dict>
 
 		<dict>
 			<key>cell</key>
 			<string>PSEditTextCell</string>
 			<key>label</key>
-			<string>Hex (overrides sliders)</string>
+			<string>Hex</string>
 			<key>key</key>
 			<string>Color2Hex</string>
 			<key>default</key>
@@ -255,7 +259,7 @@
 			<key>label</key>
 			<string>Gradient Direction</string>
 			<key>footerText</key>
-			<string>The angle, in degrees, the gradient runs along (0 = left to right).</string>
+			<string>The angle supports negative degrees (0 = left to right).</string>
 		</dict>
 
 		<dict>
@@ -273,6 +277,18 @@
 			<string>com.pizzasdu83.homebartint</string>
 			<key>PostNotification</key>
 			<string>com.pizzasdu83.homebartint/reload</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+		</dict>
+
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Bar lenght</string>
 		</dict>
 
 		<dict>
