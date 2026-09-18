@@ -2,6 +2,8 @@
 
 # Slippery Bar
 
+**Please download <ins> TweakSettings - sileo://package/xyz.cypwn.tweaksettings - from https://repo.cypwn.xyz/ </ins> for a better result. It fixes most problems with tweaks not working properly on the default setting app (blank screen/slider or input not working...) .**
+
 Here's the master switch, the ultimate button to use Slippery Bar.
 
 The second one is to activate the gradient mode on the bar.
