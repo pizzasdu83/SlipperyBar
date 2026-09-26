@@ -1,5 +1,6 @@
 #import "HBTPrefsListController.h"
 #import "HBTPrefsHeaderView.h"
+#import <Preferences/PSSpecifier.h>
 
 @interface HBTPrefsListController ()
 @property (nonatomic, strong) HBTPrefsHeaderView *hbtHeaderView;
