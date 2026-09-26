@@ -35,18 +35,6 @@
     }
 }
 
-// Recolore l'icône GitHub en template (noir en clair, blanc en sombre)
-// via UIColor.labelColor, qui s'adapte tout seul au mode d'apparence.
-- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    [super tableView:tableView willDisplayCell:cell forRowAtIndexPath:indexPath];
-
-    if ([cell.textLabel.text isEqualToString:@"Source Code"] && cell.imageView.image) {
-        UIImage *templated = [cell.imageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-        cell.imageView.image = templated;
-        cell.imageView.tintColor = [UIColor labelColor];
-    }
-}
-
 - (void)openSourceRepository {
     NSURL *url = [NSURL URLWithString:@"https://github.com/pizzasdu83/SlipperyBar"];
     if (url) [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
