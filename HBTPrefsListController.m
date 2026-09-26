@@ -35,16 +35,15 @@
     }
 }
 
-// Recolore l'icône GitHub en template (noir en clair, blanc en sombre)
-// via UIColor.labelColor, qui s'adapte tout seul au mode d'apparence.
-- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    [super tableView:tableView willDisplayCell:cell forRowAtIndexPath:indexPath];
-
-    if ([cell.textLabel.text isEqualToString:@"Source Code"] && cell.imageView.image) {
-        UIImage *templated = [cell.imageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-        cell.imageView.image = templated;
+// Remplace l'ancien override de willDisplayCell par celui-ci :
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
+    PSSpecifier *spec = [self specifierAtIndexPath:indexPath];
+    if ([spec.identifier isEqualToString:@"sourceCode"] && cell.imageView.image) {
+        cell.imageView.image = [cell.imageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
         cell.imageView.tintColor = [UIColor labelColor];
     }
+    return cell;
 }
 
 - (void)openSourceRepository {
