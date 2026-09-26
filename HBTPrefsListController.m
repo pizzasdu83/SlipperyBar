@@ -39,8 +39,7 @@
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     [super tableView:tableView willDisplayCell:cell forRowAtIndexPath:indexPath];
 
-    PSSpecifier *specifier = [self specifierAtIndexPath:indexPath];
-    if (specifier.buttonAction == @selector(openSourceRepository)) {
+    if ([cell.textLabel.text isEqualToString:@"Source Code"]) {
         UIImage *templated = [cell.imageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
         cell.imageView.image = templated;
         cell.imageView.tintColor = UIColor.labelColor;
