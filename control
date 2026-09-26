@@ -6,4 +6,4 @@ Description: Recolor the home bar (simple color and gradient) and more :)
 Maintainer: SaaS
 Author: SaaS
 Section: Tweaks
-Depends: mobilesubstrate (>= 0.9.5000), firmware (>= 15.0), preferenceloader, com.pizzasdu83.slipperyuikit (>= 0.1.0)
+Depends: mobilesubstrate (>= 0.9.5000), firmware (>= 15.0), preferenceloader

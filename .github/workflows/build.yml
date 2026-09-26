@@ -13,6 +13,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          submodules: true
 
       - name: Check cache
         run: |
@@ -28,23 +30,9 @@ jobs:
       - name: Prepare Theos
         uses: Randomblock1/theos-action@v1
 
-      # Télécharge le .deb DÉJÀ publié par le repo SlipperyUIKit (dernière
-      # release) — on ne le reconstruit jamais ici, juste extraction du
-      # framework pour le linker.
-      - name: Download SlipperyUIKit and vendor the framework
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          brew install dpkg
-          rm -f packages/*
-          mkdir -p /tmp/sui /tmp/sui-extract Vendor packages
-          gh release download --repo pizzasdu83/SlipperyUIKit --pattern "*.deb" --dir /tmp/sui --clobber
-          dpkg-deb -x /tmp/sui/*.deb /tmp/sui-extract
-          cp -R /tmp/sui-extract/var/jb/Library/Frameworks/SlipperyUIKit.framework Vendor/SlipperyUIKit.framework
-          cp /tmp/sui/*.deb packages/
-
       - name: Build package
         run: |
+          rm -f packages/*
           make package THEOS_PACKAGE_SCHEME=rootless FINALPACKAGE=1
 
       - name: Upload package
