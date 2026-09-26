@@ -1,5 +1,6 @@
 #import "HBTPrefsListController.h"
 #import "HBTPrefsHeaderView.h"
+#import <Preferences/PSSpecifier.h>
 
 @interface HBTPrefsListController ()
 @property (nonatomic, strong) HBTPrefsHeaderView *hbtHeaderView;
@@ -18,6 +19,42 @@
     [super viewDidLoad];
     self.hbtHeaderView = [[HBTPrefsHeaderView alloc] initWithTitle:@"Slippery Bar"];
     self.table.tableHeaderView = self.hbtHeaderView;
+    [self hbtUpdateGithubIconForTraitCollection:self.traitCollection];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self hbtUpdateGithubIconForTraitCollection:self.traitCollection];
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (@available(iOS 13.0, *)) {
+        if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+            [self hbtUpdateGithubIconForTraitCollection:self.traitCollection];
+        }
+    }
+}
+
+// Swaps the "Source Code" row icon between github.png (light) and
+// nogithub.png (dark, white version) depending on the system appearance.
+- (void)hbtUpdateGithubIconForTraitCollection:(UITraitCollection *)traitCollection {
+    BOOL isDark = NO;
+    if (@available(iOS 13.0, *)) {
+        isDark = (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark);
+    }
+    NSString *iconName = isDark ? @"nogithub.png" : @"github.png";
+
+    for (PSSpecifier *specifier in self.specifiers) {
+        if ([[specifier propertyForKey:@"label"] isEqualToString:@"Source Code"]) {
+            NSString *currentIcon = [specifier propertyForKey:@"icon"];
+            if (![currentIcon isEqualToString:iconName]) {
+                [specifier setProperty:iconName forKey:@"icon"];
+                [self.table reloadData];
+            }
+            break;
+        }
+    }
 }
 
 - (void)viewDidLayoutSubviews {
