@@ -35,6 +35,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          brew install dpkg
           rm -f packages/*
           mkdir -p /tmp/sui /tmp/sui-extract Vendor packages
           gh release download --repo pizzasdu83/SlipperyUIKit --pattern "*.deb" --dir /tmp/sui --clobber
