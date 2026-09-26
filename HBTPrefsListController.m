@@ -35,17 +35,6 @@
     }
 }
 
-- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    [super tableView:tableView willDisplayCell:cell forRowAtIndexPath:indexPath];
-
-    PSSpecifier *specifier = [self specifierAtIndexPath:indexPath];
-    if (specifier.buttonAction == @selector(openSourceRepository)) {
-        UIImage *templated = [cell.imageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-        cell.imageView.image = templated;
-        cell.imageView.tintColor = UIColor.labelColor;
-    }
-}
-
 - (void)openSourceRepository {
     NSURL *url = [NSURL URLWithString:@"https://github.com/pizzasdu83/SlipperyBar"];
     if (url) [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
