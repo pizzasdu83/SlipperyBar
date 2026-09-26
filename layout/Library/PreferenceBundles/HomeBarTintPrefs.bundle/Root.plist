@@ -324,39 +324,6 @@
 			<string>Please download TweakSettings - sileo://package/xyz.cypwn.tweaksettings - from https://repo.cypwn.xyz/ for a better result. It fixes most problems with tweaks not working properly on the default setting app (blank screen/slider or input not working...) .</string>
 		</dict>
 
-		<dict>
-			<key>cell</key>
-			<string>PSLinkCell</string>
-			<key>label</key>
-			<string>Source Code</string>
-			<key>icon</key>
-			<string>github.png</string>
-			<key>action</key>
-			<string>openSourceRepository</string>
-		</dict>
-
-		<dict>
-			<key>cell</key>
-			<string>PSLinkCell</string>
-			<key>label</key>
-			<string>More</string>
-			<key>icon</key>
-			<string>vibin.png</string>
-			<key>action</key>
-			<string>openButterfly</string>
-		</dict>
-
-		<dict>
-			<key>cell</key>
-			<string>PSLinkCell</string>
-			<key>label</key>
-			<string>Address me on discord</string>
-			<key>icon</key>
-			<string>discord.png</string>
-			<key>action</key>
-			<string>openMeInHalf</string>
-		</dict>
-
 	</array>
 </dict>
 </plist>

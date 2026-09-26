@@ -1,8 +1,11 @@
 #import "HBTPrefsListController.h"
-#import "HBTPrefsHeaderView.h"
+#import <SlipperyUIKit/SlipperyPrefsHeaderView.h>
+#import <SlipperyUIKit/SlipperyPrefsFooterView.h>
+#import <SlipperyUIKit/SlipperyLink.h>
 
 @interface HBTPrefsListController ()
-@property (nonatomic, strong) HBTPrefsHeaderView *hbtHeaderView;
+@property (nonatomic, strong) SlipperyPrefsHeaderView *hbtHeaderView;
+@property (nonatomic, strong) SlipperyPrefsFooterView *hbtFooterView;
 @end
 
 @implementation HBTPrefsListController
@@ -16,44 +19,40 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.hbtHeaderView = [[HBTPrefsHeaderView alloc] initWithTitle:@"Slippery Bar"];
+    NSBundle *bundle = [NSBundle bundleForClass:self.class];
+
+    self.hbtHeaderView = [[SlipperyPrefsHeaderView alloc] initWithTitle:@"Slippery Bar"
+                                                                iconName:@"HeaderIcon"
+                                                                  bundle:bundle];
     self.table.tableHeaderView = self.hbtHeaderView;
+
+    self.hbtFooterView = [SlipperyPrefsFooterView standardFooterView];
+    self.table.tableFooterView = self.hbtFooterView;
 }
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     UITableView *table = self.table;
-    if (table.tableHeaderView != self.hbtHeaderView) return;
-
     CGFloat width = table.bounds.size.width;
     if (width <= 0.0) return;
-    CGFloat height = [self.hbtHeaderView sizeThatFits:CGSizeMake(width, CGFLOAT_MAX)].height;
-    CGRect frame = self.hbtHeaderView.frame;
-    if (fabs(frame.size.width - width) > 0.5 || fabs(frame.size.height - height) > 0.5) {
-        self.hbtHeaderView.frame = CGRectMake(0.0, 0.0, width, height);
-        table.tableHeaderView = self.hbtHeaderView;
+
+    if (table.tableHeaderView == self.hbtHeaderView) {
+        CGFloat height = [self.hbtHeaderView sizeThatFits:CGSizeMake(width, CGFLOAT_MAX)].height;
+        CGRect frame = self.hbtHeaderView.frame;
+        if (fabs(frame.size.width - width) > 0.5 || fabs(frame.size.height - height) > 0.5) {
+            self.hbtHeaderView.frame = CGRectMake(0.0, 0.0, width, height);
+            table.tableHeaderView = self.hbtHeaderView;
+        }
     }
-}
 
-- (void)openSourceRepository {
-    NSURL *url = [NSURL URLWithString:@"https://github.com/pizzasdu83/SlipperyBar"];
-    if (url) [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
-    NSIndexPath *selected = self.table.indexPathForSelectedRow;
-    if (selected) [self.table deselectRowAtIndexPath:selected animated:YES];
-}
-
-- (void)openButterfly {
-    NSURL *url = [NSURL URLWithString:@"https://youtu.be/dtCZMge7oHQ"];
-    if (url) [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
-    NSIndexPath *selected = self.table.indexPathForSelectedRow;
-    if (selected) [self.table deselectRowAtIndexPath:selected animated:YES];
-}
-
-- (void)openMeInHalf {
-    NSURL *url = [NSURL URLWithString:@"https://discord.gg/e4zY6NrX"];
-    if (url) [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
-    NSIndexPath *selected = self.table.indexPathForSelectedRow;
-    if (selected) [self.table deselectRowAtIndexPath:selected animated:YES];
+    if (table.tableFooterView == self.hbtFooterView) {
+        CGFloat height = [self.hbtFooterView sizeThatFits:CGSizeMake(width, CGFLOAT_MAX)].height;
+        CGRect frame = self.hbtFooterView.frame;
+        if (fabs(frame.size.width - width) > 0.5 || fabs(frame.size.height - height) > 0.5) {
+            self.hbtFooterView.frame = CGRectMake(0.0, 0.0, width, height);
+            table.tableFooterView = self.hbtFooterView;
+        }
+    }
 }
 
 - (void)confirmResetSettings {

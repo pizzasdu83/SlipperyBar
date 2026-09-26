@@ -9,12 +9,12 @@ SlipperyBar_FILES = Tweak.xm
 SlipperyBar_CFLAGS = -fobjc-arc -Wno-deprecated-declarations
 
 BUNDLE_NAME = HomeBarTintPrefs
-HomeBarTintPrefs_FILES = HBTPrefsListController.m HBTPrefsHeaderView.m
+HomeBarTintPrefs_FILES = HBTPrefsListController.m
 HomeBarTintPrefs_INSTALL_PATH = /Library/PreferenceBundles
 HomeBarTintPrefs_FRAMEWORKS = UIKit
 HomeBarTintPrefs_PRIVATE_FRAMEWORKS = Preferences
-HomeBarTintPrefs_LDFLAGS = -ObjC
-HomeBarTintPrefs_CFLAGS = -fobjc-arc -Wno-deprecated-declarations
+HomeBarTintPrefs_LDFLAGS = -ObjC -F$(THEOS_PROJECT_DIR)/Vendor -framework SlipperyUIKit
+HomeBarTintPrefs_CFLAGS = -fobjc-arc -Wno-deprecated-declarations -F$(THEOS_PROJECT_DIR)/Vendor -I$(THEOS_PROJECT_DIR)/Vendor/SlipperyUIKit.framework/Headers
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 include $(THEOS_MAKE_PATH)/bundle.mk
