@@ -331,8 +331,6 @@
 			<string>Source Code</string>
 			<key>icon</key>
 			<string>github.png</string>
-			<key>id</key>
-			<string>sourceCode</string>
 			<key>action</key>
 			<string>openSourceRepository</string>
 		</dict>
