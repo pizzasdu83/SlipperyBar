@@ -1,6 +1,5 @@
 #import "HBTPrefsListController.h"
 #import "HBTPrefsHeaderView.h"
-#import <Preferences/PSSpecifier.h>
 
 @interface HBTPrefsListController ()
 @property (nonatomic, strong) HBTPrefsHeaderView *hbtHeaderView;
@@ -33,16 +32,6 @@
     if (fabs(frame.size.width - width) > 0.5 || fabs(frame.size.height - height) > 0.5) {
         self.hbtHeaderView.frame = CGRectMake(0.0, 0.0, width, height);
         table.tableHeaderView = self.hbtHeaderView;
-    }
-}
-
-- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    [super tableView:tableView willDisplayCell:cell forRowAtIndexPath:indexPath];
-
-    if ([cell.textLabel.text isEqualToString:@"Source Code"]) {
-        UIImage *templated = [cell.imageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-        cell.imageView.image = templated;
-        cell.imageView.tintColor = UIColor.labelColor;
     }
 }
 
