@@ -50,7 +50,7 @@
 }
 
 - (void)openMeInHalf {
-    NSURL *url = [NSURL URLWithString:@"https://discord.gg/e4zY6NrX"];
+    NSURL *url = [NSURL URLWithString:@"https://discord.gg/cHuKAXeQ7W"];
     if (url) [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
     NSIndexPath *selected = self.table.indexPathForSelectedRow;
     if (selected) [self.table deselectRowAtIndexPath:selected animated:YES];
