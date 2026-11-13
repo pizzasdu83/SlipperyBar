@@ -7,3 +7,5 @@ Maintainer: SaaS
 Author: SaaS
 Section: Tweaks
 Depends: mobilesubstrate (>= 0.9.5000), firmware (>= 15.0), preferenceloader, com.pizzasdu83.slipperyassets
+Icon: file:///var/jb/Library/PreferenceBundles/HomeBarTintPrefs.bundle/HeaderIcon.png
+Sileodepiction: https://raw.githubusercontent.com/pizzasdu83/ressources/refs/heads/main/repo/slipperybar/depiction.json
