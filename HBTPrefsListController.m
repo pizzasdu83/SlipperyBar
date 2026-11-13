@@ -1,5 +1,35 @@
 #import "HBTPrefsListController.h"
 #import "HBTPrefsHeaderView.h"
+#import <Preferences/PSSpecifier.h>
+
+#ifndef THEOS_PACKAGE_INSTALL_PREFIX
+#define THEOS_PACKAGE_INSTALL_PREFIX "/var/jb"
+#endif
+
+/// Image du dossier commun aux tweaks Slippery (paquet com.pizzasdu83.slipperyassets).
+/// THEOS_PACKAGE_INSTALL_PREFIX vaut "/var/jb" en rootless (et "" en rootful).
+/// Renvoie nil si le paquet n'est pas installé : la ligne s'affiche alors sans icône.
+static UIImage *SlipperySharedIcon(NSString *name) {
+    static NSBundle *bundle;
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        NSString *path = [NSString stringWithUTF8String:
+            THEOS_PACKAGE_INSTALL_PREFIX "/Library/Application Support/SlipperyAssets.bundle"];
+        bundle = [NSBundle bundleWithPath:path];
+    });
+    return [UIImage imageNamed:name inBundle:bundle compatibleWithTraitCollection:nil];
+}
+
+/// Donne leur image aux lignes qui ont une clé "sharedIcon" dans Root.plist
+static void ApplySharedIcons(NSArray<PSSpecifier *> *specifiers) {
+    for (PSSpecifier *specifier in specifiers) {
+        NSString *iconName = [specifier propertyForKey:@"sharedIcon"];
+        UIImage *icon = iconName ? SlipperySharedIcon(iconName) : nil;
+        if (icon) {
+            [specifier setProperty:icon forKey:@"iconImage"];
+        }
+    }
+}
 
 @interface HBTPrefsListController ()
 @property (nonatomic, strong) HBTPrefsHeaderView *hbtHeaderView;
@@ -10,6 +40,7 @@
 - (NSArray *)specifiers {
     if (!_specifiers) {
         _specifiers = [self loadSpecifiersFromPlistName:@"Root" target:self];
+        ApplySharedIcons(_specifiers);
     }
     return _specifiers;
 }

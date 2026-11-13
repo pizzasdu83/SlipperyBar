@@ -329,8 +329,8 @@
 			<string>PSLinkCell</string>
 			<key>label</key>
 			<string>Source Code</string>
-			<key>icon</key>
-			<string>github.png</string>
+			<key>sharedIcon</key>
+			<string>github</string>
 			<key>action</key>
 			<string>openSourceRepository</string>
 		</dict>
@@ -340,8 +340,8 @@
 			<string>PSLinkCell</string>
 			<key>label</key>
 			<string>More</string>
-			<key>icon</key>
-			<string>vibin.png</string>
+			<key>sharedIcon</key>
+			<string>vibin</string>
 			<key>action</key>
 			<string>openButterfly</string>
 		</dict>
@@ -351,8 +351,8 @@
 			<string>PSLinkCell</string>
 			<key>label</key>
 			<string>Address me on discord</string>
-			<key>icon</key>
-			<string>discord.png</string>
+			<key>sharedIcon</key>
+			<string>discord</string>
 			<key>action</key>
 			<string>openMeInHalf</string>
 		</dict>
